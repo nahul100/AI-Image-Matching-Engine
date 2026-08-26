@@ -1,5 +1,12 @@
+# Dependencies
 node_modules/
+
+# Environment variables
 .env
-*.log
+
+# Temporary uploads
+uploads/
+
+# Optional system files
 .DS_Store
 Thumbs.db

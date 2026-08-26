@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+ "scripts": {
+  "start": "node src/index.js",
+  "analyze": "node src/analyzeImages.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -14,6 +15,7 @@
     "@google/generative-ai": "^0.24.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "multer": "^2.2.0",
     "zod": "^4.4.3"
   }
 }
