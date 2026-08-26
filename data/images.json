@@ -1,0 +1,85 @@
+[
+  {
+    "filename": "cat.jpg",
+    "subject": "black and white cat",
+    "category": "Animals",
+    "description": "A close-up portrait of a black and white cat resting its paws on a wooden structure against a green background.",
+    "tags": [
+      "cat",
+      "pet",
+      "feline",
+      "black and white",
+      "whiskers",
+      "paws",
+      "green background"
+    ],
+    "confidence": 0.98
+  },
+  {
+    "filename": "dog.jpg",
+    "subject": "Golden Retriever puppy holding a tulip",
+    "category": "Animals",
+    "description": "A cute Golden Retriever puppy sitting on a stone patio outdoors while holding a single yellow tulip stem in its mouth.",
+    "tags": [
+      "golden retriever",
+      "puppy",
+      "dog",
+      "tulip",
+      "flower",
+      "pet",
+      "cute",
+      "outdoors"
+    ],
+    "confidence": 0.98
+  },
+  {
+    "filename": "eagle.jpg",
+    "subject": "Bald eagle in flight",
+    "category": "Wildlife",
+    "description": "A bald eagle soaring gracefully through a dark, foggy background with light snow or mist particles in the air.",
+    "tags": [
+      "bald eagle",
+      "bird",
+      "flight",
+      "wildlife",
+      "nature",
+      "predator",
+      "soaring"
+    ],
+    "confidence": 0.98
+  },
+  {
+    "filename": "fox.jpg",
+    "subject": "Red fox",
+    "category": "Wildlife",
+    "description": "A close-up portrait of a fluffy red fox with snowflakes lightly dusting its fur during winter.",
+    "tags": [
+      "fox",
+      "red fox",
+      "snow",
+      "winter",
+      "wildlife",
+      "animal",
+      "nature",
+      "portrait"
+    ],
+    "confidence": 0.98
+  },
+  {
+    "filename": "wolf.jpg",
+    "subject": "grey wolf portrait",
+    "category": "wildlife",
+    "description": "A close-up portrait of a grey wolf looking directly forward with intense eyes against a dark background.",
+    "tags": [
+      "wolf",
+      "grey wolf",
+      "wildlife",
+      "predator",
+      "animal",
+      "nature",
+      "portrait",
+      "canine"
+    ],
+    "confidence": 0.98
+  }
+]
