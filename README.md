@@ -1,3 +1,7 @@
+<img width="1053" height="160" alt="ebeb67da-168a-4e09-acff-b5d4430b7ad6-Screenshot-2026-08-26-165935" src="https://github.com/user-attachments/assets/d8a3e38d-7e8d-47da-b355-668d834cde38" />
+<img width="1057" height="802" alt="5f51d82a-d514-4e65-b320-ad134ff8482f-Screenshot-2026-08-26-115648" src="https://github.com/user-attachments/assets/d8872c1f-600b-42b2-a71e-78058bbfd4b0" />
+
+
 # AI Image Matching Engine
 
 An AI-powered backend application that analyzes images and finds the most relevant images based on either a text query or an uploaded image.
@@ -61,5 +65,3 @@ image-matching-engine/
 ├── .gitignore
 ├── package.json
 └── package-lock.json
-<img width="1053" height="160" alt="ebeb67da-168a-4e09-acff-b5d4430b7ad6-Screenshot-2026-08-26-165935.png" src="https://github.com/user-attachments/assets/aec13e29-bcab-47f9-bb38-be0291ce517f" />
-<img width="1057" height="802" alt="5f51d82a-d514-4e65-b320-ad134ff8482f-Screenshot-2026-08-26-115648.png" src="https://github.com/user-attachments/assets/2343cda0-fb84-4cfd-b212-0e5362b34d2e" />
