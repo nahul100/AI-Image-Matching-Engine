@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "analyze": "node src/analyzeImages.js",
-    "embed": "node src/embedImages.js"
+    "embed": "node src/embedImages.js",
+    "embed-post": "node src/embedPost.js"
   },
   "keywords": [],
   "author": "",

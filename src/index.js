@@ -8,6 +8,9 @@ const { rankImages } = require("./matcher");
 const { checkMismatch } = require("./mismatchGuard");
 const {inspectReview,saveReview} = require("./review");
 const postRoutes = require("./postRoutes");
+const { matchPost } = require("./postMatcher");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 dotenv.config();
 
@@ -507,7 +510,87 @@ app.post(
 
   }
 );
+// ================================
+// MATCH POST TO IMAGES
+// ================================
 
+app.get("/posts/:id/matches", async (req, res) => {
+
+  try {
+
+    const postId =
+      Number(req.params.id);
+
+    if (Number.isNaN(postId)) {
+
+      return res.status(400).json({
+        error: "Invalid post ID"
+      });
+
+    }
+
+    const matches =
+      await matchPost(postId);
+
+
+    // Save suggestions
+    const suggestions =
+      await Promise.all(
+
+        matches.slice(0, 5).map(
+          (match) =>
+            prisma.suggestion.create({
+
+              data: {
+
+                postId,
+
+                imageId:
+                  match.imageId,
+
+                score:
+                  match.score,
+
+                status:
+                  "pending"
+
+              }
+
+            })
+        )
+
+      );
+
+
+    res.json({
+
+      success: true,
+
+      post_id: postId,
+
+      matches,
+
+      suggestions
+
+    });
+
+  } catch (error) {
+
+    console.error(
+      "POST MATCH ERROR:",
+      error.message
+    );
+
+    res.status(500).json({
+
+      error:
+        error.message
+
+    });
+
+  }
+
+});
 // ================================
 // ERROR HANDLER
 // ================================
