@@ -136,3 +136,52 @@ model Review {
   @@index([imageId])
   @@index([decision])
 }
+// ================================
+// BACKGROUND PROCESSING JOB
+// ================================
+
+model ProcessingJob {
+  id          Int      @id @default(autoincrement())
+
+  jobType     String
+  status      String   @default("pending")
+
+  totalItems  Int      @default(0)
+  completed   Int      @default(0)
+  failed      Int      @default(0)
+  retries     Int      @default(0)
+
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  createdAt   DateTime @default(now())
+
+  apiUsage    ApiUsage[]
+
+  @@index([jobType])
+  @@index([status])
+}
+
+
+// ================================
+// API USAGE / COST TRACKING
+// ================================
+
+model ApiUsage {
+  id          Int      @id @default(autoincrement())
+
+  service     String
+  model       String
+  operation   String
+
+  estimatedCostUsd Float @default(0)
+
+  jobId       Int?
+  job        ProcessingJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime @default(now())
+
+  @@index([jobId])
+  @@index([operation])
+  @@index([createdAt])
+}

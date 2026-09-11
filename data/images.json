@@ -6,22 +6,22 @@
     "attributes": [
       "green eyes",
       "black and white fur",
-      "resting paws"
+      "green wall background"
     ],
-    "caption": "A black and white cat peering over a bamboo edge against a green wall.",
+    "caption": "A close-up portrait of a black and white cat looking at the camera with its paws resting on a wooden frame against a green wall.",
     "confidence": 0.98,
     "status": "accepted"
   },
   {
     "filename": "dog.jpg",
-    "subject": "golden retriever puppy",
+    "subject": "Golden Retriever puppy",
     "category": "animal",
     "attributes": [
       "golden fur",
-      "holding tulip in mouth",
-      "sitting on stone patio"
+      "holding a tulip",
+      "sitting outdoors"
     ],
-    "caption": "A golden retriever puppy sitting outdoors on a patio holding a yellow tulip stem in its mouth.",
+    "caption": "A cute Golden Retriever puppy sitting on a stone patio while holding a yellow tulip flower in its mouth.",
     "confidence": 0.98,
     "status": "accepted"
   },
@@ -30,13 +30,11 @@
     "subject": "bald eagle",
     "category": "animal",
     "attributes": [
-      "wings spread",
-      "white head",
-      "yellow beak",
       "flying",
-      "snowing background"
+      "spread wings",
+      "white head and tail"
     ],
-    "caption": "A majestic bald eagle soaring through a misty, dark sky during a light snowfall.",
+    "caption": "A majestic bald eagle soaring through a moody, snow-dusted atmosphere.",
     "confidence": 0.98,
     "status": "accepted"
   },
@@ -45,24 +43,24 @@
     "subject": "red fox",
     "category": "animal",
     "attributes": [
-      "orange and white fur",
+      "red fur",
       "dusted with snow",
-      "close-up portrait"
+      "pointed ears"
     ],
-    "caption": "A close-up portrait of a red fox with snowflakes on its fur against a snowy winter background.",
+    "caption": "A close-up portrait of a red fox with snow dusting its fur in a winter environment.",
     "confidence": 0.98,
     "status": "accepted"
   },
   {
     "filename": "wolf.jpg",
-    "subject": "grey wolf",
+    "subject": "gray wolf",
     "category": "animal",
     "attributes": [
-      "thick grey fur",
-      "intense yellow eyes",
+      "thick gray fur",
+      "intense gaze",
       "dark background"
     ],
-    "caption": "A dramatic close-up portrait of a grey wolf staring directly forward against a dark background.",
+    "caption": "A close-up portrait of a gray wolf looking directly forward with an intense expression.",
     "confidence": 0.98,
     "status": "accepted"
   }
