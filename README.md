@@ -1,68 +1,120 @@
+# AI Image Relevance & Auto-Tagging Engine
 
-# AI Image Matching Engine
+An AI-powered backend system that analyzes images, generates structured metadata, creates semantic embeddings, and recommends relevant images for blog posts.
 
-An AI-powered backend application that analyzes images and finds the most relevant images based on either a text query or an uploaded image.
+The system uses vision-based classification, vector embeddings, semantic similarity, mismatch protection, background processing, review workflows, and automated evaluation.
 
-The system uses Google's Gemini AI to understand image content and generates structured metadata such as the subject, category, description, and tags. This metadata is then used to rank existing images according to their relevance.
+---
 
 ## Features
 
-- AI-powered image analysis using Gemini
-- Extracts structured image metadata
-- Generates:
-  - Subject
-  - Category
-  - Description
-  - Tags
-  - Confidence score
-- Validates generated image data using Zod
-- Stores analyzed image metadata in JSON
-- Text-based image matching
-- Returns ranked image results
-- Image upload support using Multer
-- Analyzes uploaded images with Gemini
-- Matches uploaded images against the existing image database
-- Returns the top matching images
-- File type validation
-- 5 MB upload size limit
-- Temporary uploaded images are automatically removed after processing
+- AI-powered image classification
+- Structured metadata validation using Zod
+- Confidence scoring for image analysis
+- Automatic image caption and attribute generation
+- Semantic image embeddings
+- Semantic matching between blog posts and images
+- Mismatch guard for incorrect recommendations
+- Background processing with retry handling
+- Processing job and API usage tracking
+- Image recommendation API
+- Review and approval/rejection workflow
+- Automated tests
+- Evaluation dataset with Top-1 precision measurement
+- SQLite database using Prisma
 
-## Technology Stack
+---
 
-- Node.js
-- Express.js
-- Google Gemini API
-- Multer
-- Zod
-- Dotenv
-
-## Project Structure
+## System Architecture
 
 ```text
-image-matching-engine/
-│
-├── data/
-│   └── images.json
-│
-├── images/
-│   ├── fox.jpg
-│   ├── wolf.jpg
-│   ├── dog.jpg
-│   └── ...
-│
-├── src/
-│   ├── index.js
-│   ├── analyzeImages.js
-│   └── matcher.js
-│
-├── uploads/
-│
-├── .env
-├── .env.example
-├── .gitignore
-├── package.json
-└── package-lock.json
+                    ┌─────────────────────┐
+                    │       Images        │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ Background Job       │
+                    │ Image Classification │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   Gemini Vision     │
+                    │       Model         │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+             ┌──────────────────────────────────┐
+             │ Structured Metadata Validation   │
+             │ subject / category / attributes  │
+             │ caption / confidence             │
+             └───────────────┬──────────────────┘
+                             │
+                             ▼
+                    ┌─────────────────────┐
+                    │   Image Metadata    │
+                    │      Database       │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ Gemini Embeddings   │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │  Image Vector Store │
+                    └──────────┬──────────┘
+                               │
+                               │
+        ┌────────────────────┐ │
+        │     Blog Post      │ │
+        └─────────┬──────────┘ │
+                  │            │
+                  ▼            │
+        ┌────────────────────┐ │
+        │ Post Embedding     │ │
+        └─────────┬──────────┘ │
+                  │            │
+                  └──────┬─────┘
+                         ▼
+              ┌─────────────────────┐
+              │ Semantic Similarity │
+              │      Ranking        │
+              └──────────┬──────────┘
+                         │
+                         ▼
+              ┌─────────────────────┐
+              │   Mismatch Guard    │
+              │                     │
+              │ subject/category    │
+              │ similarity threshold│
+              │ confidence checks   │
+              └──────────┬──────────┘
+                         │
+                    ┌────┴────┐
+                    │         │
+                    ▼         ▼
+               Good Match   No Match
+                    │         │
+                    ▼         ▼
+              Recommendation Explanation
+                    │
+                    ▼
+              Review / Approval
 ```
-<img width="1053" height="160" alt="ebeb67da-168a-4e09-acff-b5d4430b7ad6-Screenshot-2026-08-26-165935" src="https://github.com/user-attachments/assets/cfb9a147-d851-40b4-8e69-131382eb50d5" />
-<img width="1057" height="802" alt="5f51d82a-d514-4e65-b320-ad134ff8482f-Screenshot-2026-08-26-115648" src="https://github.com/user-attachments/assets/a3724750-9e0b-4b5c-9e74-e1aaad095042" />
+## Tech Stack
+
+- **Runtime:** Node.js
+- **Backend:** Express.js
+- **AI Vision:** Google Gemini Vision
+- **Embeddings:** Google Gemini Embedding
+- **Validation:** Zod
+- **Database:** SQLite
+- **ORM:** Prisma
+- **File Upload:** Multer
+- **Language:** JavaScript
+- **API Testing:** PowerShell / REST API
+- **Testing:** Node.js built-in `assert`
 
