@@ -7,7 +7,9 @@
     "start": "node src/index.js",
     "analyze": "node src/analyzeImages.js",
     "embed": "node src/embedImages.js",
-    "embed-post": "node src/embedPost.js"
+    "embed-post": "node src/embedPost.js",
+    "evaluate": "node src/evaluate.js",
+    "test": "node src/tests.js && node src/testSchema.js"
   },
   "keywords": [],
   "author": "",

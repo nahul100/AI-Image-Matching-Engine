@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "post": "Red foxes are adaptable wild animals that can survive in forests and different environments.",
+    "correct_image": "fox.jpg"
+  },
+  {
+    "id": 2,
+    "post": "A wild fox uses its hunting skills and sharp senses to find food in the forest.",
+    "correct_image": "fox.jpg"
+  },
+  {
+    "id": 3,
+    "post": "Wolves are social predators that often hunt and travel together in packs.",
+    "correct_image": "wolf.jpg"
+  },
+  {
+    "id": 4,
+    "post": "The gray wolf is a powerful wild canine known for pack behavior and cooperative hunting.",
+    "correct_image": "wolf.jpg"
+  },
+  {
+    "id": 5,
+    "post": "Dogs are domesticated animals that have lived alongside humans for thousands of years.",
+    "correct_image": "dog.jpg"
+  },
+  {
+    "id": 6,
+    "post": "Domestic dogs are commonly kept as companion animals and are known for their loyalty.",
+    "correct_image": "dog.jpg"
+  },
+  {
+    "id": 7,
+    "post": "Eagles are large birds of prey that use their powerful wings and sharp eyesight while hunting.",
+    "correct_image": "eagle.jpg"
+  },
+  {
+    "id": 8,
+    "post": "A bird of prey can soar high above the ground while searching for animals to catch.",
+    "correct_image": "eagle.jpg"
+  },
+  {
+    "id": 9,
+    "post": "Cats are independent domestic animals that spend much of their time resting and grooming.",
+    "correct_image": "cat.jpg"
+  },
+  {
+    "id": 10,
+    "post": "Domestic cats are small companion animals with strong hunting instincts and excellent night vision.",
+    "correct_image": "cat.jpg"
+  }
+]
