@@ -118,3 +118,4 @@ The system uses vision-based classification, vector embeddings, semantic similar
 - **API Testing:** PowerShell / REST API
 - **Testing:** Node.js built-in `assert`
 
+<img width="1536" height="1024" alt="ChatGPT Image Sep 11, 2026, 09_46_23 PM" src="https://github.com/user-attachments/assets/5d2bb437-5166-41c0-bfb7-4d217e07d51e" />
