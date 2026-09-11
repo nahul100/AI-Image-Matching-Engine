@@ -7,13 +7,14 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { rankImages } = require("./matcher");
 const { checkMismatch } = require("./mismatchGuard");
 const {inspectReview,saveReview} = require("./review");
+const postRoutes = require("./postRoutes");
 
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
-
+app.use(postRoutes);
 const PORT = 3001;
 
 

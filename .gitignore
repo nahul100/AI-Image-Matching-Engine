@@ -10,3 +10,4 @@ uploads/
 # Optional system files
 .DS_Store
 Thumbs.db
+/src/generated/prisma
