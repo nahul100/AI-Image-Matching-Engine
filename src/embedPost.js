@@ -24,8 +24,9 @@ async function createEmbedding(text) {
 
 async function main() {
 
-  console.log("\nPOST EMBEDDING STARTED\n");
+  console.log("\nPOST EMBEDDING JOB STARTED\n");
 
+  // Find post
   const post =
     await prisma.post.findUnique({
       where: {
@@ -34,47 +35,120 @@ async function main() {
     });
 
   if (!post) {
-    console.log("Post 1 not found.");
-    return;
+    throw new Error("Post 1 not found");
   }
 
-  const text =
-    `${post.title}. ${post.content}`;
+  // Create processing job
+  const job =
+    await prisma.processingJob.create({
+      data: {
+        jobType: "post_embedding",
+        status: "running",
+        totalItems: 1,
+        startedAt: new Date()
+      }
+    });
 
-  console.log(
-    `Creating embedding for: ${post.title}`
-  );
+  console.log(`Job ID: ${job.id}`);
+  console.log(`Post: ${post.title}`);
 
-  const vector =
-    await createEmbedding(text);
+  try {
 
-  await prisma.postEmbedding.upsert({
+    const text =
+      `${post.title}. ${post.content}`;
 
-    where: {
-      postId: post.id
-    },
+    const vector =
+      await createEmbedding(text);
 
-    update: {
-      vector: JSON.stringify(vector)
-    },
+    // Track API call
+    await prisma.apiUsage.create({
+      data: {
+        service: "Google Gemini",
+        model: "gemini-embedding-001",
+        operation: "post_embedding",
+        estimatedCostUsd:
+          Number(
+            process.env.EMBEDDING_COST_PER_CALL_USD || 0
+          ),
+        jobId: job.id
+      }
+    });
 
-    create: {
-      postId: post.id,
-      vector: JSON.stringify(vector)
-    }
+    // Save embedding
+    await prisma.postEmbedding.upsert({
 
-  });
+      where: {
+        postId: post.id
+      },
 
-  console.log(
-    `SUCCESS: Post ${post.id} → ${vector.length} dimensions`
-  );
+      update: {
+        vector: JSON.stringify(vector)
+      },
 
-  console.log(
-    "\nPOST EMBEDDING COMPLETE\n"
-  );
+      create: {
+        postId: post.id,
+        vector: JSON.stringify(vector)
+      }
+
+    });
+
+    // Update job
+    await prisma.processingJob.update({
+
+      where: {
+        id: job.id
+      },
+
+      data: {
+
+        completed: 1,
+
+        status: "completed",
+
+        completedAt: new Date()
+
+      }
+
+    });
+
+    console.log(
+      `SUCCESS: Post ${post.id} → ${vector.length} dimensions`
+    );
+
+    console.log(
+      `Job ${job.id} → completed`
+    );
+
+    console.log(
+      "\nPOST EMBEDDING COMPLETE\n"
+    );
+
+  } catch (error) {
+
+    await prisma.processingJob.update({
+
+      where: {
+        id: job.id
+      },
+
+      data: {
+
+        failed: 1,
+
+        status: "failed",
+
+        completedAt: new Date()
+
+      }
+
+    });
+
+    throw error;
+  }
 }
 
 main()
+
   .catch((error) => {
 
     console.error(
@@ -85,6 +159,7 @@ main()
     process.exit(1);
 
   })
+
   .finally(async () => {
 
     await prisma.$disconnect();
