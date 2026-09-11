@@ -6,6 +6,7 @@ const path = require("path");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { rankImages } = require("./matcher");
 const { checkMismatch } = require("./mismatchGuard");
+const {inspectReview,saveReview} = require("./review");
 
 dotenv.config();
 
@@ -197,19 +198,94 @@ app.get("/match", async (req, res) => {
       `Creating embedding for query: ${query}`
     );
 
-    // Create embedding for user query
+    // 1. Create embedding for the post/query
     const queryEmbedding =
       await createEmbedding(query);
 
-    // Rank images using cosine similarity
-    const matches =
+    // 2. Get semantic ranking
+    const rankedImages =
       rankImages(queryEmbedding);
 
+    // 3. Apply mismatch guard
+    const checkedImages =
+      rankedImages.map((image) => {
+
+        // image_vectors.json doesn't contain subject,
+        // so load it from images.json
+        const imageMetadata =
+          JSON.parse(
+            fs.readFileSync(
+              path.join(
+                __dirname,
+                "..",
+                "data",
+                "images.json"
+              ),
+              "utf8"
+            )
+          );
+
+        const metadata =
+          imageMetadata.find(
+            (item) =>
+              item.filename === image.filename
+          );
+
+        const guard =
+          checkMismatch(query, metadata);
+
+        return {
+          ...image,
+          guard
+        };
+
+      });
+
+    // 4. Separate accepted and rejected images
+    const accepted =
+      checkedImages.filter(
+        (image) => image.guard.accepted
+      );
+
+    const rejected =
+      checkedImages.filter(
+        (image) => !image.guard.accepted
+      );
+
+    // 5. Apply confidence threshold
+    const similarityThreshold = 0.50;
+
+    const confidentMatches =
+      accepted.filter(
+        (image) =>
+          image.score >= similarityThreshold
+      );
+
+    // 6. Return result
     res.json({
 
       query,
 
-      matches
+      best_match:
+        confidentMatches.length > 0
+          ? confidentMatches[0]
+          : null,
+
+      matches:
+        confidentMatches.slice(0, 3),
+
+      rejected: rejected.map(
+        (image) => ({
+          filename: image.filename,
+          score: image.score,
+          reason: image.guard.reason
+        })
+      ),
+
+      message:
+        confidentMatches.length > 0
+          ? "Confident image match found"
+          : "No confident match"
 
     });
 
@@ -233,8 +309,6 @@ app.get("/match", async (req, res) => {
   }
 
 });
-
-
 // ================================
 // UPLOAD + ANALYZE + SEMANTIC MATCH
 // ================================
@@ -367,7 +441,70 @@ app.post(
 
   }
 );
+// ================================
+// REVIEW API
+// ================================
 
+// Inspect review decision
+app.get("/review/:filename", (req, res) => {
+
+  const review =
+    inspectReview(req.params.filename);
+
+  if (!review) {
+    return res.status(404).json({
+      error: "No review found for this image"
+    });
+  }
+
+  res.json({
+    success: true,
+    review
+  });
+
+});
+
+
+// Approve image
+app.post(
+  "/review/:filename/approve",
+  (req, res) => {
+
+    const review =
+      saveReview(
+        req.params.filename,
+        "approved",
+        req.body.reason || "Approved by reviewer"
+      );
+
+    res.json({
+      success: true,
+      review
+    });
+
+  }
+);
+
+
+// Reject image
+app.post(
+  "/review/:filename/reject",
+  (req, res) => {
+
+    const review =
+      saveReview(
+        req.params.filename,
+        "rejected",
+        req.body.reason || "Rejected by reviewer"
+      );
+
+    res.json({
+      success: true,
+      review
+    });
+
+  }
+);
 
 // ================================
 // ERROR HANDLER
