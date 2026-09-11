@@ -514,31 +514,75 @@ app.post(
 // MATCH POST TO IMAGES
 // ================================
 
+// ================================
+// MATCH POST TO IMAGES + GUARD
+// ================================
+
 app.get("/posts/:id/matches", async (req, res) => {
 
   try {
 
-    const postId =
-      Number(req.params.id);
+    const postId = Number(req.params.id);
 
     if (Number.isNaN(postId)) {
-
       return res.status(400).json({
         error: "Invalid post ID"
       });
-
     }
 
+    // Get the post
+    const post =
+      await prisma.post.findUnique({
+        where: {
+          id: postId
+        }
+      });
+
+    if (!post) {
+      return res.status(404).json({
+        error: "Post not found"
+      });
+    }
+
+    // Get semantic matches
     const matches =
       await matchPost(postId);
 
+    // Remove old suggestions for this post
+    await prisma.suggestion.deleteMany({
+      where: {
+        postId
+      }
+    });
+
+    // Apply mismatch guard
+    const checkedMatches =
+      matches.map((match) => {
+
+        const guard =
+          checkMismatch(
+            `${post.title}. ${post.content}`,
+            {
+              subject: match.subject,
+              category: match.category
+            }
+          );
+
+        return {
+          ...match,
+          guard
+        };
+
+      });
 
     // Save suggestions
     const suggestions =
       await Promise.all(
 
-        matches.slice(0, 5).map(
-          (match) =>
+        checkedMatches
+          .slice(0, 5)
+          .map((match) =>
+
             prisma.suggestion.create({
 
               data: {
@@ -552,15 +596,30 @@ app.get("/posts/:id/matches", async (req, res) => {
                   match.score,
 
                 status:
-                  "pending"
+                  match.guard.accepted
+                    ? "accepted"
+                    : "rejected",
+
+                reason:
+                  match.guard.reason
 
               }
 
             })
-        )
+
+          )
 
       );
 
+    // Only accepted images above similarity threshold
+    const similarityThreshold = 0.50;
+
+    const confidentMatches =
+      checkedMatches.filter(
+        (match) =>
+          match.guard.accepted &&
+          match.score >= similarityThreshold
+      );
 
     res.json({
 
@@ -568,7 +627,30 @@ app.get("/posts/:id/matches", async (req, res) => {
 
       post_id: postId,
 
-      matches,
+      best_match:
+        confidentMatches.length > 0
+          ? confidentMatches[0]
+          : null,
+
+      matches:
+        confidentMatches.slice(0, 3),
+
+      rejected:
+        checkedMatches
+          .filter(
+            (match) =>
+              !match.guard.accepted
+          )
+          .map((match) => ({
+            filename: match.filename,
+            score: match.score,
+            reason: match.guard.reason
+          })),
+
+      message:
+        confidentMatches.length > 0
+          ? "Confident image match found"
+          : "No confident match",
 
       suggestions
 
@@ -582,10 +664,7 @@ app.get("/posts/:id/matches", async (req, res) => {
     );
 
     res.status(500).json({
-
-      error:
-        error.message
-
+      error: error.message
     });
 
   }
