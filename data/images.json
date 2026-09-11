@@ -2,84 +2,68 @@
   {
     "filename": "cat.jpg",
     "subject": "black and white cat",
-    "category": "Animals",
-    "description": "A close-up portrait of a black and white cat resting its paws on a wooden structure against a green background.",
-    "tags": [
-      "cat",
-      "pet",
-      "feline",
-      "black and white",
-      "whiskers",
-      "paws",
-      "green background"
+    "category": "animal",
+    "attributes": [
+      "green eyes",
+      "black and white fur",
+      "resting paws"
     ],
-    "confidence": 0.98
+    "caption": "A black and white cat peering over a bamboo edge against a green wall.",
+    "confidence": 0.98,
+    "status": "accepted"
   },
   {
     "filename": "dog.jpg",
-    "subject": "Golden Retriever puppy holding a tulip",
-    "category": "Animals",
-    "description": "A cute Golden Retriever puppy sitting on a stone patio outdoors while holding a single yellow tulip stem in its mouth.",
-    "tags": [
-      "golden retriever",
-      "puppy",
-      "dog",
-      "tulip",
-      "flower",
-      "pet",
-      "cute",
-      "outdoors"
+    "subject": "golden retriever puppy",
+    "category": "animal",
+    "attributes": [
+      "golden fur",
+      "holding tulip in mouth",
+      "sitting on stone patio"
     ],
-    "confidence": 0.98
+    "caption": "A golden retriever puppy sitting outdoors on a patio holding a yellow tulip stem in its mouth.",
+    "confidence": 0.98,
+    "status": "accepted"
   },
   {
     "filename": "eagle.jpg",
-    "subject": "Bald eagle in flight",
-    "category": "Wildlife",
-    "description": "A bald eagle soaring gracefully through a dark, foggy background with light snow or mist particles in the air.",
-    "tags": [
-      "bald eagle",
-      "bird",
-      "flight",
-      "wildlife",
-      "nature",
-      "predator",
-      "soaring"
+    "subject": "bald eagle",
+    "category": "animal",
+    "attributes": [
+      "wings spread",
+      "white head",
+      "yellow beak",
+      "flying",
+      "snowing background"
     ],
-    "confidence": 0.98
+    "caption": "A majestic bald eagle soaring through a misty, dark sky during a light snowfall.",
+    "confidence": 0.98,
+    "status": "accepted"
   },
   {
     "filename": "fox.jpg",
-    "subject": "Red fox",
-    "category": "Wildlife",
-    "description": "A close-up portrait of a fluffy red fox with snowflakes lightly dusting its fur during winter.",
-    "tags": [
-      "fox",
-      "red fox",
-      "snow",
-      "winter",
-      "wildlife",
-      "animal",
-      "nature",
-      "portrait"
+    "subject": "red fox",
+    "category": "animal",
+    "attributes": [
+      "orange and white fur",
+      "dusted with snow",
+      "close-up portrait"
     ],
-    "confidence": 0.98
+    "caption": "A close-up portrait of a red fox with snowflakes on its fur against a snowy winter background.",
+    "confidence": 0.98,
+    "status": "accepted"
   },
   {
     "filename": "wolf.jpg",
-    "subject": "grey wolf portrait",
-    "category": "wildlife",
-    "description": "A close-up portrait of a grey wolf looking directly forward with intense eyes against a dark background.",
-    "tags": [
-      "wolf",
-      "grey wolf",
-      "wildlife",
-      "predator",
-      "animal",
-      "nature",
-      "portrait",
-      "canine"
+    "subject": "grey wolf",
+    "category": "animal",
+    "attributes": [
+      "thick grey fur",
+      "intense yellow eyes",
+      "dark background"
     ],
-    "confidence": 0.98
+    "caption": "A dramatic close-up portrait of a grey wolf staring directly forward against a dark background.",
+    "confidence": 0.98,
+    "status": "accepted"
   }
 ]
