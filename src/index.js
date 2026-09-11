@@ -4,7 +4,8 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { findMatches } = require("./matcher");
+const { rankImages } = require("./matcher");
+const { checkMismatch } = require("./mismatchGuard");
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ const PORT = 3001;
 // ================================
 // MULTER UPLOAD SETUP
 // ================================
+
 const uploadDir = path.join(
   __dirname,
   "..",
@@ -40,8 +42,9 @@ const storage = multer.diskStorage({
     cb(null, uniqueName);
   }
 });
-//multer file filter to allow only JPG, JPEG, and PNG image files
+
 const fileFilter = (req, file, cb) => {
+
   const allowedTypes = [
     "image/jpeg",
     "image/jpg",
@@ -71,6 +74,7 @@ const upload = multer({
 // ================================
 // GEMINI SETUP
 // ================================
+
 const genAI = new GoogleGenerativeAI(
   process.env.GEMINI_API_KEY
 );
@@ -81,9 +85,36 @@ const model = genAI.getGenerativeModel({
 
 
 // ================================
+// EMBEDDING MODEL
+// ================================
+
+async function createEmbedding(text) {
+
+  const { GoogleGenAI } =
+    await import("@google/genai");
+
+  const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY
+  });
+
+  const response =
+    await ai.models.embedContent({
+      model: "gemini-embedding-001",
+      contents: text
+    });
+
+  return response.embeddings[0].values;
+}
+
+
+// ================================
 // ANALYZE UPLOADED IMAGE
 // ================================
-async function analyzeUploadedImage(imagePath, mimetype) {
+
+async function analyzeUploadedImage(
+  imagePath,
+  mimetype
+) {
 
   const imageBuffer =
     fs.readFileSync(imagePath);
@@ -134,81 +165,98 @@ Do not include any explanation outside JSON.
 // ================================
 // HOME ROUTE
 // ================================
+
 app.get("/", (req, res) => {
+
   res.json({
-    message: "AI Image Matching Engine API is running"
+    message:
+      "AI Image Matching Engine API is running"
   });
+
 });
 
 
 // ================================
-// TEXT QUERY MATCH
+// SEMANTIC TEXT QUERY MATCH
 // ================================
-app.get("/match", (req, res) => {
 
-  const query = req.query.query;
-
-  if (!query) {
-    return res.status(400).json({
-      success: false,
-      error: "Please provide a query"
-    });
-  }
+app.get("/match", async (req, res) => {
 
   try {
 
-    const matches =
-      findMatches(query);
+    const query = req.query.q;
 
-    const bestMatch =
-      matches[0];
-
-    if (
-      !bestMatch ||
-      bestMatch.score < 0.1
-    ) {
-      return res.json({
-        success: true,
-        message:
-          "No confident match found",
-        query
+    if (!query) {
+      return res.status(400).json({
+        error:
+          "Query is required. Example: /match?q=red fox"
       });
     }
 
+    console.log(
+      `Creating embedding for query: ${query}`
+    );
+
+    // Create embedding for user query
+    const queryEmbedding =
+      await createEmbedding(query);
+
+    // Rank images using cosine similarity
+    const matches =
+      rankImages(queryEmbedding);
+
     res.json({
-      success: true,
+
       query,
-      best_match: bestMatch,
+
       matches
+
     });
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "MATCH ERROR:",
+      error.message
+    );
 
     res.status(500).json({
-      success: false,
-      error: error.message
+
+      error:
+        "Failed to perform semantic matching",
+
+      details:
+        error.message
+
     });
+
   }
+
 });
 
 
 // ================================
-// UPLOAD + ANALYZE + MATCH
+// UPLOAD + ANALYZE + SEMANTIC MATCH
 // ================================
+
 app.post(
   "/upload-match",
+
   upload.single("image"),
 
   async (req, res) => {
 
     if (!req.file) {
+
       return res.status(400).json({
+
         success: false,
+
         error:
           "Please upload an image using the field name 'image'"
+
       });
+
     }
 
     try {
@@ -217,7 +265,11 @@ app.post(
         `Analyzing uploaded image: ${req.file.filename}`
       );
 
-      // 1. Gemini analyzes uploaded image
+
+      // ------------------------------
+      // 1. Analyze uploaded image
+      // ------------------------------
+
       const analysis =
         await analyzeUploadedImage(
           req.file.path,
@@ -229,21 +281,53 @@ app.post(
         analysis
       );
 
-      // 2. Convert analysis into searchable text
-      const query = [
-        analysis.subject,
-        analysis.category,
-        analysis.description,
-        ...analysis.tags
-      ].join(" ");
 
-      // 3. Match against existing images
+      // ------------------------------
+      // 2. Create searchable text
+      // ------------------------------
+
+      const query = [
+
+        analysis.subject,
+
+        analysis.category,
+
+        analysis.description,
+
+        ...analysis.tags
+
+      ].join(". ");
+
+
+      // ------------------------------
+      // 3. Create embedding
+      // ------------------------------
+
+      const queryEmbedding =
+        await createEmbedding(query);
+
+
+      // ------------------------------
+      // 4. Semantic ranking
+      // ------------------------------
+
       const matches =
-        findMatches(query);
-// Delete temporary uploaded image
-        fs.unlinkSync(req.file.path);
-      // 4. Return result
+        rankImages(queryEmbedding);
+
+
+      // ------------------------------
+      // 5. Delete temporary image
+      // ------------------------------
+
+      fs.unlinkSync(req.file.path);
+
+
+      // ------------------------------
+      // 6. Return result
+      // ------------------------------
+
       res.json({
+
         success: true,
 
         uploaded_image:
@@ -256,45 +340,90 @@ app.post(
 
         matches:
           matches.slice(0, 3)
+
       });
 
     } catch (error) {
 
       console.error(error);
 
+      // Clean up uploaded file if it still exists
+      if (
+        req.file &&
+        fs.existsSync(req.file.path)
+      ) {
+        fs.unlinkSync(req.file.path);
+      }
+
       res.status(500).json({
+
         success: false,
+
         error: error.message
+
       });
+
     }
+
   }
 );
 
-//error handler
-app.use((error, req, res, next) => {
-  if (error instanceof multer.MulterError) {
-    if (error.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({
-        success: false,
-        error: "Image file must be smaller than 5 MB"
-      });
+
+// ================================
+// ERROR HANDLER
+// ================================
+
+app.use(
+  (error, req, res, next) => {
+
+    if (
+      error instanceof multer.MulterError
+    ) {
+
+      if (
+        error.code === "LIMIT_FILE_SIZE"
+      ) {
+
+        return res.status(400).json({
+
+          success: false,
+
+          error:
+            "Image file must be smaller than 5 MB"
+
+        });
+
+      }
+
     }
-  }
 
-  if (error) {
-    return res.status(400).json({
-      success: false,
-      error: error.message
-    });
-  }
+    if (error) {
 
-  next();
-});
+      return res.status(400).json({
+
+        success: false,
+
+        error:
+          error.message
+
+      });
+
+    }
+
+    next();
+
+  }
+);
+
+
 // ================================
 // START SERVER
 // ================================
+
 app.listen(PORT, () => {
+
   console.log(
     `Server running on http://localhost:${PORT}`
   );
+
 });

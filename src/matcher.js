@@ -1,60 +1,56 @@
 const fs = require("fs");
 const path = require("path");
 
-const dataFile = path.join(
+const vectorsFile = path.join(
   __dirname,
   "..",
   "data",
-  "images.json"
+  "image_vectors.json"
 );
 
-// Simple keyword-based similarity for MVP
-function calculateScore(query, image) {
-  const queryWords = query
-    .toLowerCase()
-    .split(/\W+/)
-    .filter(Boolean);
+// Cosine similarity
+function cosineSimilarity(a, b) {
+  let dotProduct = 0;
+  let magnitudeA = 0;
+  let magnitudeB = 0;
 
-  const imageText = [
-    image.subject,
-    image.category,
-    image.description,
-    ...image.tags
-  ]
-    .join(" ")
-    .toLowerCase();
-
-  let matches = 0;
-
-  for (const word of queryWords) {
-    if (imageText.includes(word)) {
-      matches++;
-    }
+  for (let i = 0; i < a.length; i++) {
+    dotProduct += a[i] * b[i];
+    magnitudeA += a[i] * a[i];
+    magnitudeB += b[i] * b[i];
   }
 
-  return matches / queryWords.length;
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0;
+  }
+
+  return (
+    dotProduct /
+    (Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB))
+  );
 }
 
-function findMatches(query) {
+// Rank images against a query embedding
+function rankImages(queryEmbedding) {
   const images = JSON.parse(
-    fs.readFileSync(dataFile, "utf8")
+    fs.readFileSync(vectorsFile, "utf8")
   );
 
-  const matches = images
+  return images
     .map((image) => ({
       filename: image.filename,
-      subject: image.subject,
-      category: image.category,
-      description: image.description,
+      text: image.text,
       score: Number(
-        calculateScore(query, image).toFixed(2)
+        cosineSimilarity(
+          queryEmbedding,
+          image.embedding
+        ).toFixed(4)
       )
     }))
     .sort((a, b) => b.score - a.score);
-
-  return matches;
 }
 
 module.exports = {
-  findMatches
+  cosineSimilarity,
+  rankImages
 };
