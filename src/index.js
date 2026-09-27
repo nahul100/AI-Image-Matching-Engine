@@ -1,6 +1,9 @@
-const express = require("express");
 const dotenv = require("dotenv");
+dotenv.config();
+
+const express = require("express");
 const multer = require("multer");
+const { imageQueue } = require("./queue");
 const fs = require("fs");
 const path = require("path");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
@@ -11,8 +14,6 @@ const postRoutes = require("./postRoutes");
 const { matchPost } = require("./postMatcher");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
-dotenv.config();
 
 const app = express();
 
@@ -313,6 +314,37 @@ app.get("/match", async (req, res) => {
 
   }
 
+});
+// ================================
+app.get("/jobs/:id", async (req, res) => {
+  try {
+    const job = await imageQueue.getJob(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({
+        error: "Job not found"
+      });
+    }
+
+    const state = await job.getState();
+
+    res.json({
+      jobId: job.id,
+      name: job.name,
+      state,
+      progress: job.progress,
+      data: job.data,
+      result: job.returnvalue || null,
+      failedReason: job.failedReason || null
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to get job status"
+    });
+  }
 });
 // ================================
 // UPLOAD + ANALYZE + SEMANTIC MATCH
@@ -715,8 +747,45 @@ app.use(
 
   }
 );
+// new endpoint to queue image for background processing
+app.post("/images/process", upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        error: "Image file is required"
+      });
+    }
 
+    const job = await imageQueue.add(
+      "process-image",
+      {
+        filename: req.file.path
+      },
+      {
+        attempts: 3,
+        backoff: {
+          type: "exponential",
+          delay: 2000
+        },
+        removeOnComplete: 100,
+        removeOnFail: 100
+      }
+    );
 
+    res.status(202).json({
+      message: "Image queued for background processing",
+      jobId: job.id,
+      filename: req.file.filename
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to queue image"
+    });
+  }
+});
 // ================================
 // START SERVER
 // ================================
