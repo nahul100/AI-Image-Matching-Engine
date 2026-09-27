@@ -1,9 +1,8 @@
 # AI Image Relevance & Auto-Tagging Engine
 
-An AI-powered backend system that analyzes images, generates structured metadata, creates semantic embeddings, and recommends relevant images for blog posts.
+A backend image relevance and auto-tagging system. First, a vision model analyzes images and produces structured metadata, which I validate using Zod. I then generate embeddings and use cosine similarity for semantic matching between blog posts and images. To prevent semantically incorrect recommendations, I implemented a mismatch guard based on the detected subject and similarity threshold.
 
-The system combines vision-based classification, structured output validation, semantic embeddings, similarity ranking, mismatch protection, background processing, retry handling, database persistence, human review, and automated evaluation.
-
+For processing large numbers of images, I implemented BullMQ with Redis Cloud. Instead of making the API wait for expensive AI operations, the API creates a background job and immediately returns a job ID. A separate worker consumes the job, calls the vision model, validates the result, and stores it in PostgreSQL/SQLite through Prisma. I also added retries, job status tracking, and API cost tracking. This architecture is similar to production systems because API requests and resource-intensive background workloads are separated and workers can be scaled independently.
 ---
 
 ## Features
@@ -187,3 +186,12 @@ The project demonstrates several production-oriented backend concepts:
 - Semantic vector search
 - Automated evaluation
 
+## Scaling Using Redis Queue
+I can horizontally scale my background processing by running multiple instances of the same worker. Redis acts as the shared queue, and BullMQ coordinates which worker processes each job. I don't need to create separate worker files.
+
+                              Redis 
+                    ┌───────────┼───────────┐
+                    ↓           ↓           ↓
+                 Worker 1    Worker 2    Worker 3
+                  2 jobs      2 jobs      2 jobs
+                 at once     at once     at once
