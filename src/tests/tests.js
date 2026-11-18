@@ -2,8 +2,8 @@ const assert = require("assert");
 const fs = require("fs");
 const path = require("path");
 
-const { checkMismatch } = require("./mismatchGuard");
-const { cosineSimilarity } = require("./matcher");
+const { checkMismatch } = require("../matching/mismatchGuard");
+const { cosineSimilarity } = require("../matching/matcher");
 
 console.log("\n=== Automated Tests ===\n");
 
@@ -92,6 +92,7 @@ console.log("PASS: Cosine similarity correctly identifies unrelated vectors");
 
 const evalFile = path.join(
   __dirname,
+  "..",
   "..",
   "data",
   "eval.json"

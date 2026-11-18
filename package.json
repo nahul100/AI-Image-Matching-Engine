@@ -2,14 +2,15 @@
   "name": "image-matching-engine",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/app/server.js",
   "scripts": {
-    "start": "node src/index.js",
-    "analyze": "node src/analyzeImages.js",
-    "embed": "node src/embedImages.js",
-    "embed-post": "node src/embedPost.js",
-    "evaluate": "node src/evaluate.js",
-    "test": "node src/tests.js && node src/testSchema.js"
+    "start": "node src/app/server.js",
+    "analyze": "node src/jobs/analyzeImages.js",
+    "embed": "node src/jobs/embedImages.js",
+    "embed-post": "node src/jobs/embedPost.js",
+    "evaluate": "node src/jobs/evaluate.js",
+    "worker": "node src/queue/worker.js",
+    "test": "node src/tests/tests.js && node src/tests/testSchema.js"
   },
   "keywords": [],
   "author": "",

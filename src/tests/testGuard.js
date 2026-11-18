@@ -1,4 +1,4 @@
-const { checkMismatch } = require("./mismatchGuard");
+const { checkMismatch } = require("../matching/mismatchGuard");
 
 const foxPost =
   "The behavior of red foxes";

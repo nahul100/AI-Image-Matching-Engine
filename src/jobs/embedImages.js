@@ -9,12 +9,14 @@ const prisma = new PrismaClient();
 const inputFile = path.join(
   __dirname,
   "..",
+  "..",
   "data",
   "images.json"
 );
 
 const outputFile = path.join(
   __dirname,
+  "..",
   "..",
   "data",
   "image_vectors.json"

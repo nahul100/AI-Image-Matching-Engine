@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { processImage } = require("./processImage");
+const { processImage } = require("../processing/processImage");
 
 async function test() {
   try {

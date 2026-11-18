@@ -19,11 +19,13 @@ const model = genAI.getGenerativeModel({
 const imagesDir = path.join(
   __dirname,
   "..",
+  "..",
   "images"
 );
 
 const outputFile = path.join(
   __dirname,
+  "..",
   "..",
   "data",
   "images.json"

@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const { Worker } = require("bullmq");
 const { connection } = require("./queue");
-const { processImage } = require("./processImage");
+const { processImage } = require("../processing/processImage");
 
 const worker = new Worker(
   "image-processing",

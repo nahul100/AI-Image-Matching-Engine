@@ -2,7 +2,9 @@ function checkMismatch(postText, image) {
 
   const post = postText.toLowerCase();
 
-  const subject = image.subject.toLowerCase();
+  const subject = (image && image.subject
+    ? image.subject
+    : "").toLowerCase();
 
   // Fox post vs non-fox animal
   if (
